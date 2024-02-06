@@ -12,7 +12,7 @@ const activeTab = ref("infos");
 
 <template>
   <div
-    class="flex flex-col p-5 bg-base-200 w-full"
+    class="flex flex-col p-5 bg-base-200 w-full min-h-[18rem]"
     :class="{ '!bg-base-300': ID % 2 === 0 }"
   >
     <div role="tablist" class="tabs tabs-boxed">
