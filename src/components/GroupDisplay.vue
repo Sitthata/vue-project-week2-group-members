@@ -35,6 +35,11 @@ const activeTab = ref("infos");
       <h1 class="text-xl">Name: {{ groupName }}</h1>
       <h1>Section: {{ section }}</h1>
       <a :href="repo" class="link link-secondary">View Project</a>
+      <img
+        class="aspect-square"
+        :src="`/groupImages/pic-${ID}.jpg`"
+        :alt="groupName"
+      />
     </div>
     <div v-show="activeTab === 'members'" class="flex flex-col gap-2 p-3">
       <h1 class="text-3xl">Member</h1>

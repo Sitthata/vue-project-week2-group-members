@@ -39,6 +39,8 @@ const paginatedGroups = computed(() => {
 watch(currentPage, (oldValue, newValue) => {
   console.log("currentPage", oldValue, newValue);
 });
+
+
 </script>
 
 <template>
@@ -58,6 +60,7 @@ watch(currentPage, (oldValue, newValue) => {
     </div>
   </div>
   <section class="mt-5">
+    
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <GroupDisplay
         v-for="group in paginatedGroups"
