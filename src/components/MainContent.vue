@@ -1,27 +1,43 @@
 <script setup lang="ts">
 import type { Group } from "@/data.t";
 import data from "@/groups.json";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import GroupDisplay from "./GroupDisplay.vue";
 import AddNewModal from "./AddNewModal.vue";
+import PaginationButton from "./PaginationButton.vue";
 
 let groupsData: Group[];
 groupsData = data;
 
 const groups = ref<Group[]>(groupsData);
-const searchText = ref<String>("");
-const sectionNumber = ref<number>(1);
+const searchText = ref<string>("");
+const sortBySection = ref<boolean>(false);
 
-const filteredGroup = computed(() => {
-  return groups.value.filter((group) =>
-    group.groupName
-      .toLocaleLowerCase()
-      .includes(searchText.value.toLocaleLowerCase())
+const toggleSort = () => {
+  sortBySection.value = !sortBySection.value;
+  groups.value = groupsData;
+  if (sortBySection.value) groups.value.sort((a, b) => a.section - b.section);
+};
+
+const currentPage = ref(1);
+const itemPerPage = 5;
+const filteredGroups = computed(() => {
+  return groups.value.filter(
+    (group) =>
+      group.groupName.toLowerCase().includes(searchText.value.toLowerCase()) ||
+      group.section.toString().includes(searchText.value) ||
+      group.members.some((member) =>
+        member.studentId.toString().includes(searchText.value.toLowerCase())
+      )
   );
 });
-
-watch(sectionNumber, () => {
-  console.log(sectionNumber.value);
+const paginatedGroups = computed(() => {
+  const start = (currentPage.value - 1) * itemPerPage;
+  const end = start + itemPerPage;
+  return filteredGroups.value.slice(start, end);
+});
+watch(currentPage, (oldValue, newValue) => {
+  console.log("currentPage", oldValue, newValue);
 });
 </script>
 
@@ -38,26 +54,24 @@ watch(sectionNumber, () => {
         Add new
       </button>
       <AddNewModal />
-      <details class="dropdown dropdown-end">
-        <summary class="m-1 btn">1</summary>
-        <ul
-          class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
-        >
-          <li @click="sectionNumber = 1"><a>1</a></li>
-          <li @click="sectionNumber = 2"><a>2</a></li>
-        </ul>
-      </details>
+      <button class="btn btn-ghost" @click="toggleSort">section</button>
     </div>
   </div>
   <section class="mt-5">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <GroupDisplay
-        v-for="group in filteredGroup"
+        v-for="group in paginatedGroups"
         :key="group.ID"
         :group="group"
       />
     </div>
   </section>
+  <PaginationButton
+    :currentPage="currentPage"
+    :itemPerPage="itemPerPage"
+    :groupsLength="filteredGroups.length"
+    @update:currentPage="currentPage = $event"
+  />
 </template>
 
 <style></style>
